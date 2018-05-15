@@ -16,7 +16,9 @@ if (process.env.NODE_ENV === 'production') {
 let url = {
   healthNum: {
     getList: config.site + '/cPortal/v1/healthNum/getList'
-  }
+  },
+  demoUrl: config.site + '',
+  fileUpload: config.site + '/cPortal/v1/common/fileUpload'
 }
 export default {
   api_url: url,
@@ -41,6 +43,48 @@ export default {
       })
     }
   },
+  // upload
+  fileUpload(param, cb) {
+    let self = this
+    return new Promise((resolve, reject) => {
+      appcan
+        .upload({
+          url: this.api_url.fileUpload,
+          path: param,
+          type: 0,
+          field: 'upFile',
+          quality: 1,
+          maxwidth: 640,
+          onUploadProgress: function(response) {
+            cb(response.percent)
+          }
+        })
+        .then(
+          function(response) {
+            var data = JSON.parse(response.responseString)
+            if (data.retCode === '000000') return resolve(data)
+            else {
+              Vue.$vux.loading.hide()
+              Vue.$vux.toast.show({
+                text: '上传失败',
+                type: 'text'
+              })
+            }
+          },
+          function(err) {
+            self.errFn(err)
+            // Vue.$vux.loading.hide()
+            return reject(err)
+          }
+        )
+        .catch(function(err) {
+          // Vue.$vux.loading.hide()
+          self.errFn(err)
+          return reject(err)
+        })
+    })
+  },
+  // post demo
   getHealthNumListList(param) {
     let self = this
     return new Promise((resolve, reject) => {
@@ -49,6 +93,26 @@ export default {
           url: this.api_url.healthNum.getList,
           method: 'POST',
           data: param
+        })
+        .then(function(response) {
+          if (response.data.retCode === '000000') return resolve(response)
+          else self.errFn(1, response)
+        })
+        .catch(function(err) {
+          self.errFn(err)
+          // return reject(err)
+        })
+    })
+  },
+  // get demo demoUrl无效
+  getDemo(param) {
+    let self = this
+    return new Promise((resolve, reject) => {
+      appcan
+        .request({
+          url: this.api_url.demoUrl,
+          method: 'GET',
+          params: param
         })
         .then(function(response) {
           if (response.data.retCode === '000000') return resolve(response)

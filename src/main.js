@@ -23,7 +23,10 @@ import { Actionsheet,
   ViewBox,
   Loading,
   BusPlugin,
-  Previewer} from 'vux'
+  Previewer,
+  Flexbox,
+  FlexboxItem,
+  GroupTitle} from 'vux'
 Vue.use(global)
 Vue.use(appcan)
 Vue.use(BusPlugin)
@@ -40,6 +43,9 @@ Vue.component('gridItem', GridItem)
 Vue.component('view-box', ViewBox)
 Vue.component('loading', Loading)
 Vue.component('previewer', Previewer)
+Vue.component('flexbox', Flexbox)
+Vue.component('flexbox-item', FlexboxItem)
+Vue.component('group-title', GroupTitle)
 Vue.use(VueLazyLoad, {
   error: './static/default.png',
   loading: './static/default.png'

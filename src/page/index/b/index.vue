@@ -3,7 +3,7 @@
     <view-box ref="viewBox" body-padding-top="46px">
       <x-header slot="header" :left-options="{showBack: false}" style="width:100%;position:absolute;left:0;top:0;z-index:100;">健康</x-header>
       <group title="">
-        <cell title="jssdk" is-link :link="{name:'jssdk'}"></cell>
+        <cell title="文件选择、拍照及上传upload" is-link :link="{name:'upload'}"></cell>
       </group>
     </view-box>
   </div>

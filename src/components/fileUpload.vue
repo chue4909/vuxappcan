@@ -27,19 +27,12 @@
 </template>
 
 <script>
-import API from '../config/common'
+import API from '../js/common'
 import appcan from '../libs/appcan'
 export default {
   directives: {
-    TransferDom
   },
   components: {
-    GroupTitle,
-    Flexbox,
-    FlexboxItem,
-    Actionsheet,
-    Previewer,
-    Loading
   },
   name: 'fileUpload',
   props: {
@@ -166,8 +159,6 @@ export default {
       }).then(
         function(response) {
           self.showLoading = false
-          // var path = self.realpath
-          // self.listPic.push({ src: path })
           self.listPic.push({ src: response.data.preAddr })
           self.images.push(response.data.storeAddr)
           self.$vux.toast.show({

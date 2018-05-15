@@ -36,6 +36,7 @@ const home = () => import('@/page/index/home/index').then(m => m.default)
 const b = () => import('@/page/index/b/index').then(m => m.default)
 const jssdk = () => import('@/page/jssdk/jssdk').then(m => m.default)
 const list = () => import('@/page/list/index').then(m => m.default)
+const upload = () => import('@/page/upload/index').then(m => m.default)
 Vue.use(Router)
 
 export default new Router({
@@ -67,6 +68,11 @@ export default new Router({
       path: '/list',
       name: 'list',
       component: list
+    },
+    {
+      path: '/upload',
+      name: 'upload',
+      component: upload
     }
   ]
 })
