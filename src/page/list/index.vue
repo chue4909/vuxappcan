@@ -41,7 +41,7 @@ export default {
       follow: 0,
       catId: '',
       currentPage: 1,
-      pageSize: 25,
+      pageSize: 12,
       isNoData: false,
       totalPage: null,
       startY: 0,
@@ -65,7 +65,6 @@ export default {
       this.getHealthNumList()
     },
     getHealthNumList() {
-      var self = this
       if (this._isDestroyed) {
         return
       }
@@ -104,11 +103,14 @@ export default {
         }
       })
     },
+    // 合并去重
     dataForm(newData, oldData, idx) {
       let old = [...oldData, ...newData]
       let neww = {}
       const newArr = old.reduce((item, next) => {
-        neww[next[idx]] ? '' : (neww[next[idx]] = true && item.push(next))
+        if (!neww[next[idx]]) {
+          neww[next[idx]] = true && item.push(next)
+        }
         return item
       }, [])
       return newArr
