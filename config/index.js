@@ -3,7 +3,7 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-const cPortalUrl = 'http://192.168.4.45:8080'
+const cPortalUrl = 'http://lf.appcan.cn:9089'
 
 module.exports = {
   dev: {

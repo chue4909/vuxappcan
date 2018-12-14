@@ -11,7 +11,7 @@ let config = {
   site: ''
 }
 if (process.env.NODE_ENV === 'production') {
-  config.site = 'http://192.168.4.45:8080'
+  config.site = 'http://lf.appcan.cn:9089'
 }
 let url = {
   healthNum: {

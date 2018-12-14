@@ -3,12 +3,18 @@
     <view-box ref="viewBox"  body-padding-top="46px"  body-padding-bottom="0">
     <x-header slot="header" :left-options="{backText: ''}" style="width:100%;position:absolute;left:0;top:0;z-index:100;">list
     </x-header>
-    <scroller
-      :on-refresh="refresh"
-      :on-infinite="loadMore"
-      ref="myscroller" v-show="!isNoData" :class="[device==='ios'?'positionios':'position']" >
-      <glist :list="data"></glist>
-    </scroller>
+    <!-- :data="data" -->
+    <!-- :startY="parseInt(startY)" -->
+    <scroll ref="scroll" v-show="!isNoData"
+              :scrollbar="false"
+              :pullDownRefresh="pullDownRefreshObj"
+              :pullUpLoad="pullUpLoadObj"
+              @pullingDown="refresh"
+              @pullingUp="getHealthNumList"
+              :startY="startY"
+      >
+      <glist :list="data" :cols="2"></glist>
+      </scroll>
     <noData text="暂无数据" v-show="isNoData"></noData>
     </view-box>
   </div>
@@ -17,13 +23,15 @@
 <script>
 import glist from '../components/list'
 import noData from '../../components/noData'
+import scroll from '../../components/scroll/scroll'
 import API from '../../js/common'
 import { mapGetters } from 'vuex'
 export default {
   directives: {},
   components: {
     glist,
-    noData
+    noData,
+    scroll
   },
   name: 'list',
   data() {
@@ -32,64 +40,87 @@ export default {
       data: [],
       follow: 0,
       catId: '',
-      page: 1,
-      pageSize: 24,
+      currentPage: 1,
+      pageSize: 25,
       isNoData: false,
-      position: {},
-      listItem: []
+      totalPage: null,
+      startY: 0,
+      pullDownRefreshObj: {
+        threshold: 50,
+        stop: 40,
+        txt: '刷新成功'
+      },
+      pullUpLoadObj: {
+        threshold: 0,
+        txt: {
+          more: '拖动获取更多数据',
+          noMore: '到底了'
+        }
+      }
     }
   },
   methods: {
     init() {
-      this.$refs.myscroller.triggerPullToRefresh()
+      this.currentPage = 1
+      this.getHealthNumList()
     },
     getHealthNumList() {
       var self = this
+      if (this._isDestroyed) {
+        return
+      }
       API.getHealthNumListList({
         follow: this.follow,
         catId: this.catId,
-        page: this.page,
+        page: this.currentPage,
         pageSize: this.pageSize
-      }).then(function(response) {
-        self.$log(self.page, response.data.data.list.length)
+      }).then(response => {
         if (response.data.retCode === '000000') {
-          if (self.page === 1) {
-            self.$refs.myscroller.finishPullToRefresh()
-            self.data = []
-          }
-          self.listItem = response.data.data.list
-          let start = self.listItem.length
-          for (let i = 0; i < start; i++) {
-            self.data.push(self.listItem[i])
-          }
-          if (self.data.length === 0) {
-            self.isNoData = true
+          this.totalPage =
+            parseInt(response.data.data.totalNum / this.pageSize) + 1
+
+          if (this.currentPage === 1) {
+            this.data = response.data.data.list
           } else {
-            self.isNoData = false
+            // self.data = self.data.concat(response.data.data.list)
+            this.data = this.dataForm(response.data.data.list, this.data, 'id')
           }
-          if (self.listItem.length === self.pageSize) {
-            self.page++
-            self.$refs.myscroller.finishInfinite(0)
-          } else {
-            self.listItem = []
-            return self.$refs.myscroller.finishInfinite(2)
+
+          // // scroll传入data时
+          // if (response.data.data.list.length === 0) {
+          //   // this.isEnd = true
+          //   // 如果没有新数据
+          //   this.$refs.scroll.forceUpdate()
+          // } else {
+          //   this.currentPage++
+          // }
+
+          if (this.totalPage !== this.currentPage) {
+            this.currentPage++
           }
-          self.$refs.myscroller.resize()
+          this.$nextTick(m => {
+            this.$refs.scroll.forceUpdate()
+          })
         }
       })
     },
-    loadMore() {
-      if (!this.listItem.length) {
-        setTimeout(() => {
-          this.$refs.myscroller.finishInfinite(2)
-        })
-        return
-      }
-      this.getHealthNumList()
+    dataForm(newData, oldData, idx) {
+      let old = [...oldData, ...newData]
+      let neww = {}
+      const newArr = old.reduce((item, next) => {
+        neww[next[idx]] ? '' : (neww[next[idx]] = true && item.push(next))
+        return item
+      }, [])
+      return newArr
     },
     refresh() {
-      this.page = 1
-      this.getHealthNumList()
+      this.init()
+    },
+    rebuildScroll() {
+      this.nextTick(() => {
+        this.$refs.scroll.destroy()
+        this.$refs.scroll.initScroll()
+      })
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -98,34 +129,38 @@ export default {
         // 通过 `vm` 访问组件实例
         vm.catId = vm.$route.params.catId
         vm.data = []
-        vm.page = 1
-        vm.listItem = []
+        vm.currentPage = 1
         vm.isNoData = false
+        vm.totalPage = null
+        vm.startY = 0
         vm.init()
       })
     } else next()
   },
   created() {},
   activated() {
-    var self = this
-    if (this.position.top) {
-      setTimeout(() => {
-        self.$refs.myscroller.scrollBy(
-          self.position.left,
-          self.position.top,
-          false
-        )
-        self.position = {}
-      })
-    }
+    // var self = this
+    // if (this.position.top) {
+    //   setTimeout(() => {
+    //     self.$refs.myscroller.scrollBy(
+    //       self.position.left,
+    //       self.position.top,
+    //       false
+    //     )
+    //     self.position = {}
+    //   })
+    // }
   },
   beforeRouteLeave(to, from, next) {
-    this.position = this.$refs.myscroller.getPosition()
+    // this.position = this.$refs.myscroller.getPosition()
     next()
   },
   watch: {
     isLogin(val) {
       this.init()
+    },
+    startY() {
+      this.rebuildScroll()
     }
   },
   computed: {

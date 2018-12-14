@@ -1,5 +1,5 @@
 <template>
-  <div style="height:100%;z-index:2">
+  <div style="height:100%;z-index:5">
     <view-box ref="viewBox" body-padding-top="46px"  body-padding-bottom="0">
       <x-header slot="header" style="width:100%;position:absolute;left:0;top:0;z-index:100;">jssdk</x-header>
       <group :title="msg">

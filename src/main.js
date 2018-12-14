@@ -8,7 +8,6 @@ import global from './js/global'
 import appcan from './libs/appcan'
 import '@/assets/fonts/iconfont.css'
 import store from './store'
-import VueScroller from 'vue-scroller'
 import VueLazyLoad from 'vue-lazyload'
 
 import { Actionsheet,
@@ -30,7 +29,6 @@ import { Actionsheet,
 Vue.use(global)
 Vue.use(appcan)
 Vue.use(BusPlugin)
-Vue.use(VueScroller)
 Vue.directive('transfer-dom', TransferDom)
 Vue.component('actionsheet', Actionsheet)
 Vue.component('x-header', XHeader)

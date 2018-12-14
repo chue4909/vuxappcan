@@ -24,6 +24,7 @@ export default {
   methods: {
     onHealthClick(item) {
       console.log(item)
+      this.$router.push({ name: 'jssdk' })
     },
     followDeal(info) {
       for (var i in this.list) {
@@ -49,5 +50,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less" scoped>
-
 </style>
