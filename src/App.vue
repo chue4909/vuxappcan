@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div class="app">
     <loading v-model="isLoading"></loading>
     <transition
         @after-enter="$vux.bus && $vux.bus.$emit('vux:after-view-enter')"
@@ -64,8 +64,9 @@ export default {
   }
 }
 </script>
-<style scoped>
-#app {
+<style lang="less">
+@import '~vux/src/styles/reset.less';
+.app {
   width: 100%;
   height: 100%;
   position: absolute;
@@ -84,9 +85,9 @@ export default {
 .vux-pop-in-leave-active {
   will-change: transform;
   transition: all 500ms;
-  height: 100%;
-  top: 0;
-  position: absolute;
+  right: 0;
+  left: 0;
+  position: fixed;
   backface-visibility: hidden;
   perspective: 1000;
 }
@@ -97,9 +98,6 @@ export default {
 .vux-pop-out-leave-active {
   transform: translate3d(100%, 0, 1px);
 }
-</style>
-<style lang="less">
-@import '~vux/src/styles/reset.less';
 html,
 body {
   height: 100%;
