@@ -3,7 +3,7 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-const cPortalUrl = 'http://lf.appcan.cn:9089'
+const cPortalUrl = 'https://test.appcan.cn'
 
 module.exports = {
   dev: {
@@ -12,14 +12,14 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/cPortal': {
+      '/v4': {
         target: cPortalUrl,
         changeOrigin: true
       }
     },
 
     // Various Dev Server settings
-    host: 'localhost', // can be overwritten by process.env.HOST
+    host: '0.0.0.0', // can be overwritten by process.env.HOST
     port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: false,
     errorOverlay: true,

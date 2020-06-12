@@ -1,49 +1,34 @@
 <template>
-  <div class="app">
-    <Agrid :list="list" :cols="cols" @on-gridItem-click="onHealthClick"></Agrid>
-  </div>
+  <group :gutter="0">
+    <cell v-for="item in list" :key="item.uniqueField" :title="item.name" @click.native="onItemClick" is-link>
+      <img slot="icon" width="20" style="display:block;margin-right:5px;" v-lazy="item.avatorLoc">
+    </cell>
+  </group>
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import Agrid from '../../components/grid'
 export default {
-  components: {
-    Agrid
-  },
-  props: ['list', 'cols'],
+  props: ['list'],
   name: 'glist',
   data() {
     return {
-      msg: 'CPortal'
-      // defaultSrc: require('../assets/image/logo.png')
     }
   },
   computed: {
     ...mapGetters('login', ['isLogin'])
   },
   methods: {
-    onHealthClick(item) {
+    onItemClick(item) {
       console.log(item)
       this.$router.push({ name: 'jssdk' })
-    },
-    followDeal(info) {
-      for (var i in this.list) {
-        if (info.id === this.list[i].id) {
-          this.list[i].follow = info.follow
-        }
-      }
     }
   },
   mounted() {
     console.log(this.list)
   },
   created() {
-    // this.$vux.Bus.$on('followDeal', value => {
-    //   this.followDeal(value)
-    // })
   },
   beforeDestroy() {
-    // this.$vux.Bus.$off('followDeal')
   }
 }
 </script>

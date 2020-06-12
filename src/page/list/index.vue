@@ -1,21 +1,23 @@
 <template>
   <div style="height:100%;z-index:5;background-color:#ffffff;">
-    <view-box ref="viewBox"  body-padding-top="46px"  body-padding-bottom="0">
-    <x-header slot="header" :left-options="{backText: ''}" style="width:100%;position:absolute;left:0;top:0;z-index:100;">list
-    </x-header>
-    <!-- :data="data" -->
-    <!-- :startY="parseInt(startY)" -->
-    <scroll ref="scroll" v-show="!isNoData"
-              :scrollbar="false"
-              :pullDownRefresh="pullDownRefreshObj"
-              :pullUpLoad="pullUpLoadObj"
-              @pullingDown="refresh"
-              @pullingUp="getHealthNumList"
-              :startY="startY"
+    <view-box ref="viewBox" body-padding-top="46px" body-padding-bottom="0">
+      <x-header
+        slot="header"
+        :left-options="{backText: ''}"
+        style="width:100%;position:absolute;left:0;top:0;z-index:100;"
+      >list</x-header>
+      <scroll
+        ref="scroll"
+        :scrollbar="false"
+        :pullDownRefresh="pullDownRefreshObj"
+        :pullUpLoad="pullUpLoadObj"
+        @pullingDown="refresh"
+        @pullingUp="getList"
       >
-      <glist :list="data" :cols="2"></glist>
+        <glist :list="data"></glist>
       </scroll>
-    <noData text="暂无数据" v-show="isNoData"></noData>
+
+      <noData text="暂无数据" v-show="!data.length"></noData>
     </view-box>
   </div>
 </template>
@@ -38,13 +40,12 @@ export default {
     return {
       msg: 'CPortal',
       data: [],
-      follow: 0,
-      catId: '',
+      domainName: '企业移动门户统一认证',
+      orgId: '003',
       currentPage: 1,
-      pageSize: 12,
-      isNoData: false,
+      pageSize: 15,
       totalPage: null,
-      startY: 0,
+      noMore: false,
       pullDownRefreshObj: {
         threshold: 50,
         stop: 40,
@@ -62,45 +63,46 @@ export default {
   methods: {
     init() {
       this.currentPage = 1
-      this.getHealthNumList()
+      this.getList()
     },
-    getHealthNumList() {
-      if (this._isDestroyed) {
+    getList() {
+      if (this.noMore) {
+        this.$nextTick(m => {
+          this.$refs.scroll.forceUpdate()
+        })
         return
       }
-      API.getHealthNumListList({
-        follow: this.follow,
-        catId: this.catId,
-        page: this.currentPage,
+      API.getList({
+        domainName: this.softToken,
+        orgId: this.orgId,
+        pageNo: this.currentPage,
         pageSize: this.pageSize
       }).then(response => {
-        if (response.data.retCode === '000000') {
-          this.totalPage =
-            parseInt(response.data.data.totalNum / this.pageSize) + 1
+        if (response.userList) {
+          this.totalPage = response.totalPages
 
-          if (this.currentPage === 1) {
-            this.data = response.data.data.list
+          if (response.pageNo === 1) {
+            this.data = response.userList
           } else {
-            // self.data = self.data.concat(response.data.data.list)
-            this.data = this.dataForm(response.data.data.list, this.data, 'id')
+            this.data = this.dataForm(
+              response.userList,
+              this.data,
+              'uniqueField'
+            )
           }
-
-          // // scroll传入data时
-          // if (response.data.data.list.length === 0) {
-          //   // this.isEnd = true
-          //   // 如果没有新数据
-          //   this.$refs.scroll.forceUpdate()
-          // } else {
-          //   this.currentPage++
-          // }
 
           if (this.totalPage !== this.currentPage) {
             this.currentPage++
           }
-          this.$nextTick(m => {
-            this.$refs.scroll.forceUpdate()
-          })
+          if (response.pageNo === response.totalPages) {
+            this.noMore = true
+          }
+        } else {
+          this.noMore = true
         }
+        this.$nextTick(m => {
+          this.$refs.scroll.forceUpdate()
+        })
       })
     },
     // 合并去重
@@ -116,6 +118,7 @@ export default {
       return newArr
     },
     refresh() {
+      this.noMore = false
       this.init()
     },
     rebuildScroll() {
@@ -129,40 +132,24 @@ export default {
     if (from.name === 'home') {
       next(vm => {
         // 通过 `vm` 访问组件实例
-        vm.catId = vm.$route.params.catId
+        // vm.catId = vm.$route.params.catId
         vm.data = []
         vm.currentPage = 1
-        vm.isNoData = false
         vm.totalPage = null
-        vm.startY = 0
+        vm.noMore = false
         vm.init()
       })
     } else next()
   },
+  mounted() {},
   created() {},
-  activated() {
-    // var self = this
-    // if (this.position.top) {
-    //   setTimeout(() => {
-    //     self.$refs.myscroller.scrollBy(
-    //       self.position.left,
-    //       self.position.top,
-    //       false
-    //     )
-    //     self.position = {}
-    //   })
-    // }
-  },
+  activated() {},
   beforeRouteLeave(to, from, next) {
-    // this.position = this.$refs.myscroller.getPosition()
     next()
   },
   watch: {
     isLogin(val) {
       this.init()
-    },
-    startY() {
-      this.rebuildScroll()
     }
   },
   computed: {

@@ -1,7 +1,7 @@
 import appcan from '../libs/appcan'
 import Vue from 'vue'
 import global from './global'
-import { ToastPlugin, AlertPlugin, LoadingPlugin } from 'vux'
+import { ToastPlugin, AlertPlugin, LoadingPlugin, md5 } from 'vux'
 Vue.use(global)
 Vue.use(ToastPlugin)
 Vue.use(AlertPlugin)
@@ -10,22 +10,35 @@ Vue.use(LoadingPlugin)
 let config = {
   site: ''
 }
-if (process.env.NODE_ENV === 'production') {
-  config.site = 'http://lf.appcan.cn:9089'
+
+if (navigator.userAgent.toLowerCase().indexOf('appcan') > 0) {
+  // if (process.env.NODE_ENV === 'production') {
+  config.site = 'https://test.appcan.cn'
+  // }
 }
 let url = {
-  healthNum: {
-    getList: config.site + '/cPortal/v1/healthNum/getList'
-  },
+  getList: config.site + '/v4/OA/getPersonnel',
   demoUrl: config.site + '',
-  fileUpload: config.site + '/cPortal/v1/common/fileUpload'
+  fileUpload: config.site + '/v4/feedback/uploadFeedbackImg'
 }
 export default {
   api_url: url,
+  getHeader () {
+    var curTime = Date.now()
+    var key = md5('EPortal:0647513c-88f1-46c9-b764-b38e19f0e4e6:' + curTime)
+    // var emmToken = JSON.parse(appcan.val('emmToken'))
+    var accessToken = '227b7c9c-ce15-4873-875f-1bff418545a2'
+    var headerParam = {
+      'x-mas-app-id': 'EPortal',
+      appverify: 'md5=' + key + ';ts=' + curTime,
+      accessToken: accessToken
+    }
+    return headerParam
+  },
   errFn(t, err) {
     Vue.$vux.loading.hide()
     if (t === 1) {
-      if (err.data.retCode === '010016' || err.data.status === 14504) {
+      if (err.data.ret === '010016' || err.data.status === 14504) {
         // 未登录
         Vue.$router.push({ name: 'login' })
       } else {
@@ -52,7 +65,7 @@ export default {
           url: this.api_url.fileUpload,
           path: param,
           type: 0,
-          field: 'upFile',
+          field: 'myFile',
           quality: 1,
           maxwidth: 640,
           onUploadProgress: function(response) {
@@ -62,7 +75,7 @@ export default {
         .then(
           function(response) {
             var data = JSON.parse(response.responseString)
-            if (data.retCode === '000000') return resolve(data)
+            if (data.ret === 0) return resolve(data)
             else {
               Vue.$vux.loading.hide()
               Vue.$vux.toast.show({
@@ -85,18 +98,18 @@ export default {
     })
   },
   // post demo
-  getHealthNumListList(param) {
+  postList(param) {
     let self = this
     return new Promise((resolve, reject) => {
       appcan
         .request({
-          url: this.api_url.healthNum.getList,
+          url: this.api_url.demoUrl,
           method: 'POST',
-          data: param
+          data: param,
+          headers: this.getHeader()
         })
         .then(function(response) {
-          if (response.data.retCode === '000000') return resolve(response)
-          else self.errFn(1, response)
+          resolve(response.data)
         })
         .catch(function(err) {
           self.errFn(err)
@@ -105,17 +118,18 @@ export default {
     })
   },
   // get demo demoUrl无效
-  getDemo(param) {
+  getList(params) {
     let self = this
     return new Promise((resolve, reject) => {
       appcan
         .request({
-          url: this.api_url.demoUrl,
+          url: this.api_url.getList,
           method: 'GET',
-          params: param
+          params,
+          headers: this.getHeader()
         })
         .then(function(response) {
-          if (response.data.retCode === '000000') return resolve(response)
+          if (response.data.userList) return resolve(response.data)
           else self.errFn(1, response)
         })
         .catch(function(err) {

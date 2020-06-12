@@ -1,5 +1,5 @@
 <template>
-  <div style="height:100%;z-index:5">
+  <div style="height:100%;z-index:6">
     <view-box ref="viewBox" body-padding-top="46px"  body-padding-bottom="0">
       <x-header slot="header" style="width:100%;position:absolute;left:0;top:0;z-index:100;">jssdk</x-header>
       <group :title="msg">
@@ -45,12 +45,7 @@
         <cell title="localstorage 获取" value="val" is-link @click.native="getVal"></cell>
         <cell title="localstorage 清除" value="clear" is-link @click.native="clear"></cell>
         <cell title="localstorage 通过key清除" value="clear" is-link @click.native="clearbykey"></cell>
-        <cell title="修改当前页面标题(健康号专用)" value="setWindowTitle" is-link @click.native="setWindowTitle"></cell>
-        <x-input title="健康号右侧menu选项(健康号专用)"  v-model="menus"></x-input>
-        <cell title="设置健康号右侧menu选项(健康号专用)" value="setTitleMenu" is-link @click.native="setTitleMenu"></cell>
-        <cell title="获取健康号右侧menu选项(健康号专用)" value="getTitleMenu" is-link @click.native="getTitleMenu"></cell>
-        <x-input title="当前页面标题颜色(健康号专用)"  v-model="titleColor"></x-input>
-        <cell title="修改当前页面标题颜色(健康号专用)" value="setTitleBackgroundColor" is-link @click.native="setTitleBackgroundColor"></cell>
+
 
       </group>
       <div v-transfer-dom>
