@@ -98,14 +98,14 @@ export default {
     })
   },
   // post demo
-  postList(param) {
+  postList(data) {
     let self = this
     return new Promise((resolve, reject) => {
       appcan
         .request({
           url: this.api_url.demoUrl,
           method: 'POST',
-          data: param,
+          data,
           headers: this.getHeader()
         })
         .then(function(response) {

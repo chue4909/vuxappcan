@@ -26,7 +26,7 @@
 import glist from '../components/list'
 import noData from '../../components/noData'
 import scroll from '../../components/scroll/scroll'
-import API from '../../js/common'
+import API from '@/js/common'
 import { mapGetters } from 'vuex'
 export default {
   directives: {},
@@ -73,7 +73,7 @@ export default {
         return
       }
       API.getList({
-        domainName: this.softToken,
+        domainName: this.domainName,
         orgId: this.orgId,
         pageNo: this.currentPage,
         pageSize: this.pageSize

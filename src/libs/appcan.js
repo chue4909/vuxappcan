@@ -1052,12 +1052,17 @@ var storage = window.localStorage;
 
    */
 function setVal(key, value) {
+  var value1 = value;
+  if (!Object(__WEBPACK_IMPORTED_MODULE_0__base__["e" /* isString */])(value1)) {
+    value1 = JSON.stringify(value1);
+  }
   if (storage) {
-    var value1 = value;
-    if (!Object(__WEBPACK_IMPORTED_MODULE_0__base__["e" /* isString */])(value1)) {
-      value1 = JSON.stringify(value1);
-    }
     storage.setItem(key, value1);
+  }
+  try {
+    uexWindow.putLocalData(key, value1)
+  } catch (error) {
+
   }
 }
 
@@ -1067,10 +1072,16 @@ function setVal(key, value) {
 
    */
 function getVal(key) {
+  var resultVal = ''
   if (storage && key) {
-    return storage.getItem(key);
+    resultVal = storage.getItem(key);
   }
-  return '';
+  try {
+    resultVal = resultVal || uexWindow.getLocalData(key) || null
+  } catch (e) {
+    resultVal = resultVal || null
+  }
+  return resultVal;
 }
 
 /*
@@ -1100,8 +1111,20 @@ function getKeys() {
 function clear(key) {
   if (key && Object(__WEBPACK_IMPORTED_MODULE_0__base__["e" /* isString */])(key)) {
     storage.removeItem(key);
+    try {
+      uexWindow.removeLocalData(key);
+    } catch (error) {
+
+    }
+
   } else {
     storage.clear();
+    try {
+      uexWindow.removeLocalData();
+    } catch (error) {
+
+    }
+
   }
 }
 
@@ -2768,7 +2791,10 @@ function logs(obj) {
       type:
   }
   */
-function scanQRCode(callback) {
+function scanQRCode(callback,jsonData) {
+  if(jsonData){
+    uexScanner.setJsonData(jsonData);
+  }
   uexScanner.open(callback);
 }
 /**
@@ -3351,7 +3377,6 @@ function upload(config) {
 
     if (uploader) {
       if (config.headers) uexUploaderMgr.setHeaders(uploader, config.headers);
-
       uexUploaderMgr.uploadFile(uploader, config.path, config.field, config.quality, config.maxwidth, function (packageSize, percent, responseString, status) {
         switch (status) {
           case 0:
