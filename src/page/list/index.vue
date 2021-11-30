@@ -3,9 +3,10 @@
     <view-box ref="viewBox" body-padding-top="46px" body-padding-bottom="0">
       <x-header
         slot="header"
-        :left-options="{backText: ''}"
+        :left-options="{ backText: '' }"
         style="width:100%;position:absolute;left:0;top:0;z-index:100;"
-      >list</x-header>
+        >list</x-header
+      >
       <scroll
         ref="scroll"
         :scrollbar="false"
@@ -40,8 +41,6 @@ export default {
     return {
       msg: 'CPortal',
       data: [],
-      domainName: '企业移动门户统一认证',
-      orgId: '003',
       currentPage: 1,
       pageSize: 15,
       totalPage: null,
@@ -73,28 +72,22 @@ export default {
         return
       }
       API.getList({
-        domainName: this.domainName,
-        orgId: this.orgId,
-        pageNo: this.currentPage,
-        pageSize: this.pageSize
+        current: this.currentPage,
+        size: this.pageSize
       }).then(response => {
-        if (response.userList) {
+        if (response.list) {
           this.totalPage = response.totalPages
 
-          if (response.pageNo === 1) {
-            this.data = response.userList
+          if (response.current === 1) {
+            this.data = response.list
           } else {
-            this.data = this.dataForm(
-              response.userList,
-              this.data,
-              'uniqueField'
-            )
+            this.data = this.dataForm(response.list, this.data, 'id')
           }
 
           if (this.totalPage !== this.currentPage) {
             this.currentPage++
           }
-          if (response.pageNo === response.totalPages) {
+          if (response.current === response.totalPages) {
             this.noMore = true
           }
         } else {

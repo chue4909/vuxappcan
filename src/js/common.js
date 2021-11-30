@@ -13,17 +13,17 @@ let config = {
 
 if (navigator.userAgent.toLowerCase().indexOf('appcan') > 0) {
   // if (process.env.NODE_ENV === 'production') {
-  config.site = 'https://test.appcan.cn'
+  config.site = 'http://yapi.smart-xwork.cn/mock/116495'
   // }
 }
 let url = {
-  getList: config.site + '/v4/OA/getPersonnel',
+  getList: config.site + '/demo/list/get',
   demoUrl: config.site + '',
-  fileUpload: config.site + '/v4/feedback/uploadFeedbackImg'
+  fileUpload: config.site + '/demo/upload'
 }
 export default {
   api_url: url,
-  getHeader () {
+  getHeader() {
     var curTime = Date.now()
     var key = md5('EPortal:0647513c-88f1-46c9-b764-b38e19f0e4e6:' + curTime)
     // var emmToken = JSON.parse(appcan.val('emmToken'))
@@ -38,14 +38,12 @@ export default {
   errFn(t, err) {
     Vue.$vux.loading.hide()
     if (t === 1) {
-      if (err.data.ret === '010016' || err.data.status === 14504) {
+      if (err.data.code === '000001') {
         // 未登录
         Vue.$router.push({ name: 'login' })
       } else {
         Vue.$vux.toast.show({
-          text: err
-            ? err.data.errInfo || err.data.msg || err.data.message
-            : '请求错误',
+          text: err ? err.data.message : '请求错误',
           type: 'text'
         })
       }
@@ -129,8 +127,9 @@ export default {
           headers: this.getHeader()
         })
         .then(function(response) {
-          if (response.data.userList) return resolve(response.data)
-          else self.errFn(1, response)
+          if (response.data.code === '100000') {
+            return resolve(response.data.data)
+          } else self.errFn(1, response)
         })
         .catch(function(err) {
           self.errFn(err)

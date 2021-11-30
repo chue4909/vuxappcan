@@ -1,11 +1,16 @@
 <template>
   <div class="app">
-    <grid :cols="cols" >
-        <grid-item style="padding:1.8rem 0 .5rem;border:1px" v-for="( listItem, indx ) in list" :key="indx"  @on-item-click="$emit('on-gridItem-click', listItem)">
-          <img slot="icon" v-lazy="listItem.icon" class="itemImg icon-circle">
-          <span slot="label" class="itemLable">{{ listItem.name }}</span>
-        </grid-item>
-      </grid>
+    <grid :cols="cols">
+      <grid-item
+        style="padding:1.8rem 0 .5rem;border:1px"
+        v-for="(listItem, indx) in list"
+        :key="indx"
+        @on-item-click="$emit('on-gridItem-click', listItem)"
+      >
+        <img slot="icon" v-lazy="listItem.icon" class="itemImg icon-circle" />
+        <span slot="label" class="itemLable">{{ listItem.name }}</span>
+      </grid-item>
+    </grid>
   </div>
 </template>
 <script>
@@ -59,7 +64,7 @@ export default {
 .app .weui-grid::before {
   border: none;
 }
-.icon-circle{
+.icon-circle {
   border-radius: 50%;
 }
 </style>

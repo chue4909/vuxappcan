@@ -3,7 +3,7 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-const cPortalUrl = 'https://test.appcan.cn'
+const cPortalUrl = 'http://yapi.smart-xwork.cn/mock/116495'
 
 module.exports = {
   dev: {
@@ -12,7 +12,7 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/v4': {
+      '/demo': {
         target: cPortalUrl,
         changeOrigin: true
       }
